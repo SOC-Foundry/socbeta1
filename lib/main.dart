@@ -62,7 +62,7 @@ class HomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Forging Elite Threat Detections from Data',
+                      'Forging Elite Threat Detections from Data for Natalie',
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w300,
