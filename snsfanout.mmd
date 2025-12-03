@@ -1,0 +1,72 @@
+---
+title: SIEM Evaluation Architecture
+---
+flowchart LR
+    subgraph Sources["Log Sources"]
+        VPC["VPC Flow Logs"]
+        SUB["Sublime"]
+        CF["Cloudflare"]
+        OKTA["Okta"]
+    end
+
+    subgraph Buckets["S3 Buckets (SSE-S3 🔒)"]
+        S3_VPC["🪣 vpc-flowlogs"]
+        S3_SUB["🪣 sublime-logs"]
+        S3_CF["🪣 cloudflare-logs"]
+        S3_OKTA["🪣 okta-logs"]
+    end
+
+    SNS["📢 SNS Topic\nsiem-eval-topic"]
+
+    subgraph Queues["SQS Queues"]
+        subgraph PantherQueues["Panther"]
+            SQS_P1["vpc-panther"]
+            SQS_P2["sublime-panther"]
+            SQS_P3["cf-panther"]
+            SQS_P4["okta-panther"]
+        end
+        subgraph ScannerQueues["Scanner"]
+            SQS_S1["vpc-scanner"]
+            SQS_S2["sublime-scanner"]
+            SQS_S3["cf-scanner"]
+            SQS_S4["okta-scanner"]
+        end
+    end
+
+    subgraph SIEMs["SIEM Platforms"]
+        PANTHER["🛡️ Panther\nAssumeRole Access"]
+        SCANNER["🔍 Scanner.dev\nAssumeRole Access"]
+    end
+
+    %% Log Source to S3
+    VPC --> S3_VPC
+    SUB --> S3_SUB
+    CF --> S3_CF
+    OKTA --> S3_OKTA
+
+    %% S3 to SNS
+    S3_VPC --> SNS
+    S3_SUB --> SNS
+    S3_CF --> SNS
+    S3_OKTA --> SNS
+
+    %% SNS Fan-Out
+    SNS --> SQS_P1 & SQS_P2 & SQS_P3 & SQS_P4
+    SNS --> SQS_S1 & SQS_S2 & SQS_S3 & SQS_S4
+
+    %% SQS to SIEMs (TLS Encrypted)
+    SQS_P1 & SQS_P2 & SQS_P3 & SQS_P4 -.->|"🔒 TLS 1.3"| PANTHER
+    SQS_S1 & SQS_S2 & SQS_S3 & SQS_S4 -.->|"🔒 TLS 1.3"| SCANNER
+
+    %% Styling
+    classDef s3 fill:#3F8624,stroke:#2E5F1A,color:#fff
+    classDef sns fill:#D86613,stroke:#A34E0E,color:#fff
+    classDef sqs fill:#FF4F8B,stroke:#CC3F6F,color:#fff
+    classDef siem fill:#232F3E,stroke:#FF9900,color:#fff
+    classDef source fill:#1A73E8,stroke:#1557B0,color:#fff
+
+    class S3_VPC,S3_SUB,S3_CF,S3_OKTA s3
+    class SNS sns
+    class SQS_P1,SQS_P2,SQS_P3,SQS_P4,SQS_S1,SQS_S2,SQS_S3,SQS_S4 sqs
+    class PANTHER,SCANNER siem
+    class VPC,SUB,CF,OKTA source

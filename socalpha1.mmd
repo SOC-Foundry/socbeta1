@@ -1,0 +1,84 @@
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#e3f2fd', 'primaryBorderColor':'#1565c0', 'primaryTextColor':'#0d47a1', 'lineColor':'#1976d2', 'secondaryColor':'#e8f5e9', 'tertiaryColor':'#fff3e0'}}}%%
+
+flowchart TD
+    subgraph "EXTERNAL"
+        A[Scanner SIEM]
+        TI[TAXII2 Threat Feeds]
+    end
+
+    subgraph "GCP PROJECT: socalpha1"
+        subgraph "INGESTION LAYER"
+            D{{"Pub/Sub Topic<br/>panther-alerts-dev"}}
+        end
+
+        subgraph "PROCESSING LAYER - PRIVATE VPC"
+            subgraph "4 Parallel Agents"
+                F1["🔍 Goose Agent<br/>(Cloud Run)<br/>Rule Logic Analysis"]
+                F2["📚 RAG Agent<br/>(Cloud Function)<br/>Historical Context"]
+                F3["🔧 Config Agent<br/>(Cloud Function)<br/>Change Detection"]
+                F4["📊 Anomaly Agent<br/>(Cloud Function)<br/>Statistical Outliers"]
+            end
+
+            subgraph "ML/AI Services"
+                G1[DeepSeek LLM<br/>on Vertex AI]
+                G2[Vector Embeddings<br/>on Vertex AI]
+                G3[Anomaly Model<br/>on Vertex AI]
+            end
+
+            subgraph "Data Services"
+                DB1[(BigQuery<br/>Alert History<br/>+ Vectors)]
+                DB2[(Cloud Asset<br/>Inventory)]
+                DB3[(Jira Change<br/>Records)]
+            end
+        end
+
+        subgraph "ORCHESTRATION"
+            H{{"Cloud Workflows<br/>Decision Engine"}}
+        end
+
+        subgraph "OUTPUTS"
+            I1[(BigQuery<br/>Classifications)]
+            I2[Tines SOAR]
+            I3[Slack Alerts]
+        end
+    end
+
+    %% Primary Flow
+    A -->|Webhook| D
+    D ==>|Fan-out| F1
+    D ==>|Fan-out| F2
+    D ==>|Fan-out| F3
+    D ==>|Fan-out| F4
+
+    %% Agent Dependencies
+    F1 -.-> G1
+    F2 -.-> G1
+    F2 -.-> G2
+    F2 -.-> DB1
+    F3 -.-> DB2
+    F3 -.-> DB3
+    F4 -.-> G3
+    F4 -.-> DB1
+
+    %% Threat Intel Flow
+    TI -->|Dataflow| DB1
+
+    %% Aggregation
+    F1 --> H
+    F2 --> H
+    F3 --> H
+    F4 --> H
+
+    %% Final Output
+    H --> I1
+    H -->|High Priority| I2
+    H -->|Critical| I3
+
+    %% Styling
+    style A fill:#ffe0b2
+    style D fill:#e3f2fd
+    style H fill:#f3e5f5
+    style F1 fill:#d4edda
+    style F2 fill:#d4edda
+    style F3 fill:#d4edda
+    style F4 fill:#d4edda
