@@ -88,7 +88,11 @@ class HomePage extends StatelessWidget {
   Widget _buildHero() {
     return Column(
       children: [
-        const FaIcon(FontAwesomeIcons.shieldHalved, size: 64, color: Colors.cyanAccent),
+        Image.asset(
+          'assets/images/logo.png',
+          height: 80,
+          fit: BoxFit.contain,
+        ),
         const SizedBox(height: 24),
         Text(
           'SOC FOUNDRY',
