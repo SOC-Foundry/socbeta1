@@ -86,26 +86,33 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildHero() {
+    final titleStyle = GoogleFonts.orbitron(
+      fontSize: 56,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 4,
+      color: Colors.white,
+      shadows: [
+        Shadow(color: Colors.cyanAccent.withValues(alpha: 0.5), blurRadius: 20),
+      ],
+    );
+
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.asset(
-          'assets/images/logo.png',
-          height: 80,
-          fit: BoxFit.contain,
+        Center(
+          child: Image.asset(
+            'assets/images/logo.png',
+            height: 160,
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
+          ),
         ),
         const SizedBox(height: 24),
         Text(
           'SOC FOUNDRY',
           textAlign: TextAlign.center,
-          style: GoogleFonts.orbitron(
-            fontSize: 56,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 4,
-            color: Colors.white,
-            shadows: [
-              Shadow(color: Colors.cyanAccent.withValues(alpha: 0.5), blurRadius: 20),
-            ],
-          ),
+          style: titleStyle,
         ),
         const SizedBox(height: 16),
         Text(

@@ -44,3 +44,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 PROJECT_SUMMARY.md
+PKGBUILD
+
+# Binary Artifacts
+web/downloads/*.deb
