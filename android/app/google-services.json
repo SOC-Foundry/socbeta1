@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "188166314767",
+    "project_id": "websitealpha",
+    "storage_bucket": "websitealpha.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:188166314767:android:0f302183b3fd57bf02fc7a",
+        "android_client_info": {
+          "package_name": "com.example.geminicli_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_l9Fdd6PY1CD5rBPtOpbk42_gSxqp4e0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
