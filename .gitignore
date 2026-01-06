@@ -4,4 +4,4 @@
 build/
 .flutter-plugins
 .flutter-plugins-dependencies
-.deb
+*.deb
