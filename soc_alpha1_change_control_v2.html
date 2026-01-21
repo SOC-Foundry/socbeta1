@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Alpha1 - GCP Architecture with Change Control Integration</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #1a202c;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2d3748;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #764ba2;
+        }
+        .diagram-container {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+        .mermaid {
+            text-align: center;
+            margin: 20px auto;
+        }
+        .description {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #4a5568;
+        }
+        .legend {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .legend h3 {
+            margin-top: 0;
+            color: #d68910;
+        }
+        .legend ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .summary-box h3 {
+            margin-top: 0;
+        }
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .tech-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .critical-box {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .critical-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .critical-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .positioning-box {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .positioning-box h4 {
+            margin-top: 0;
+            color: #065f46;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 SOC Alpha1 - GCP Cloud-Native Architecture</h1>
+        
+        <div class="summary-box">
+            <h3>Executive Summary</h3>
+            <p>Closed-loop, agentic AI system that sits between a customer's SIEM and SOAR within their own org VPC. 
+            SOC Alpha1 learns from alert data to reduce noise and curate workflows before they enter the SOAR, 
+            using Google Cloud Platform's native services with Vertex AI for ML/AI capabilities. 
+            All data processing occurs within a private VPC ensuring zero data exfiltration to public internet.</p>
+        </div>
+
+        <div class="positioning-box">
+            <h4>🎯 System Purpose</h4>
+            <p><strong>Position:</strong> Between Customer SIEM (Panther) → <em>SOC Alpha1</em> → Customer SOAR (Tines)</p>
+            <p><strong>Function:</strong> Alert noise reduction, workflow curation, and intelligent classification through parallel AI agent analysis.</p>
+            <p><strong>Output Routing:</strong> Medium, High, and Critical severity alerts flow to Tines SOAR for human action.</p>
+        </div>
+
+        <div class="critical-box">
+            <h4>🚨 Critical Alert Triggers</h4>
+            <ul>
+                <li><strong>Unauthorized AWS Changes:</strong> CloudTrail events with no correlated approved Jira change control ticket</li>
+                <li><strong>Novel Anomalies:</strong> High anomaly score (>0.8) combined with zero historical pattern matches</li>
+            </ul>
+        </div>
+
+        <div class="tech-stack">
+            <div class="tech-item"><strong>Ingestion:</strong> Pub/Sub (Native)</div>
+            <div class="tech-item"><strong>Storage:</strong> BigQuery</div>
+            <div class="tech-item"><strong>ML/AI:</strong> Vertex AI</div>
+            <div class="tech-item"><strong>Compute:</strong> Cloud Run/Functions</div>
+            <div class="tech-item"><strong>Orchestration:</strong> Cloud Workflows</div>
+            <div class="tech-item"><strong>Security:</strong> Private Service Connect</div>
+        </div>
+
+        <h2>1. Complete System Architecture</h2>
+        <div class="description">
+            End-to-end data flow from Panther SIEM through the four parallel AI agents to final classification and alerting.
+            Panther publishes alerts directly to Pub/Sub via native integration. The architecture leverages GCP's Private Service Connect 
+            to ensure all Vertex AI traffic remains within the private VPC. Medium, High, and Critical alerts route to Tines SOAR.
+        </div>
+        <div class="diagram-container">
+            <div class="mermaid">
+%%{init: {'theme':'dark', 'themeVariables': { 'primaryColor':'#1f2937', 'primaryTextColor':'#f3f4f6', 'primaryBorderColor':'#60a5fa', 'lineColor':'#60a5fa', 'secondaryColor':'#374151', 'tertiaryColor':'#4b5563', 'background':'#111827', 'mainBkg':'#1f2937', 'secondBkg':'#374151', 'tertiaryBkg':'#4b5563', 'textColor':'#f3f4f6', 'labelTextColor':'#f3f4f6'}}}%%
+
+flowchart TB
+    subgraph "PANTHER SIEM"
+        A[Detection Rules<br/>Alert Engine]
+    end
+
+    subgraph "GCP PUB/SUB INGESTION"
+        subgraph "Native Integration"
+            D{Pub/Sub Topic<br/>panther-alerts-dev}
+        end
+        
+        subgraph "Agent Subscriptions"
+            E1[Subscription:<br/>goose-agent-sub]
+            E2[Subscription:<br/>rag-agent-sub]
+            E3[Subscription:<br/>config-agent-sub]
+            E4[Subscription:<br/>anomaly-agent-sub]
+            E5[Subscription:<br/>socalpha1_sub]
+        end
+    end
+
+    subgraph "GCP SECURE AI VPC [10.0.0.0/16]"
+        subgraph "Private Service Connect Zone"
+            PSC[Private Service<br/>Connect Endpoint]
+        end
+        
+        subgraph "AGENT COMPUTE [10.0.1.0/24]"
+            F1[Cloud Run<br/>Goose Agent<br/>🔍 Rule Logic Analysis]
+            F2[Cloud Function Gen2<br/>RAG Agent<br/>📚 Historical Context]
+            F3[Cloud Function Gen2<br/>Config Agent<br/>🔧 Change Control Correlation]
+            F4[Cloud Function Gen2<br/>Anomaly Agent<br/>📊 Statistical Detection]
+        end
+        
+        subgraph "DATA & ML SERVICES [10.0.2.0/24]"
+            G1[Panther API<br/>GraphQL Endpoint]
+            G2[BigQuery<br/>Vector Store +<br/>Historical Alerts]
+            G3[Vertex AI Endpoint<br/>DeepSeek-R1<br/>LLM]
+            G4[Vertex AI Endpoint<br/>Text Embedding<br/>gecko@003]
+            G5[Cloud Asset<br/>Inventory +<br/>Audit Logs]
+            G6[Vertex AI Endpoint<br/>Isolation Forest<br/>Anomaly Model]
+            G7[BigQuery Table<br/>jira_change_tickets<br/>Enrichment Source]
+        end
+
+        subgraph "SECURITY BOUNDARIES"
+            VPC_SC[VPC Service Controls<br/>Perimeter]
+            WIF[Workload Identity<br/>Federation]
+        end
+    end
+
+    subgraph "GCP AGGREGATION & OUTPUT"
+        H{Cloud Workflows<br/>Aggregation State Machine}
+        I1[BigQuery Table<br/>classified_alerts]
+        I2[Tines SOAR<br/>Medium/High/Critical]
+        I3[Slack<br/>Critical Alerts Only]
+        I4[Cloud Monitoring<br/>Dashboard]
+    end
+
+    subgraph "THREAT INTELLIGENCE"
+        TI1[TAXII2 Feeds]
+        TI2[Dataflow<br/>Streaming Pipeline]
+        TI3[BigQuery<br/>Threat Intel Store]
+    end
+
+    subgraph "CHANGE CONTROL DATA"
+        JiraSync[Jira Cloud<br/>Scheduled Sync]
+        JiraSync -->|Daily ETL| G7
+    end
+
+    A ==>|Native Pub/Sub<br/>Integration| D
+    
+    D -->|Fan-out| E1
+    D -->|Fan-out| E2
+    D -->|Fan-out| E3
+    D -->|Fan-out| E4
+    D -->|Fan-out| E5
+
+    E1 -->|Push| F1
+    E2 -->|Push| F2
+    E3 -->|Push| F3
+    E4 -->|Push| F4
+    E5 -->|Stream| G2
+
+    F1 -.->|Via PSC| G1
+    F1 -.->|Via PSC| G3
+    
+    F2 -.->|Via PSC| G2
+    F2 -.->|Via PSC| G3
+    F2 -.->|Via PSC| G4
+    
+    F3 -.->|Via PSC| G5
+    F3 -.->|Enrichment Query| G7
+    
+    F4 -.->|Via PSC| G6
+    F4 -.->|Via PSC| G2
+
+    F1 -->|Result JSON| H
+    F2 -->|Result JSON| H
+    F3 -->|Result JSON| H
+    F4 -->|Result JSON| H
+
+    H -->|All Classifications| I1
+    H -->|Med/High/Critical| I2
+    H -->|Critical Only| I3
+    H -->|Metrics| I4
+
+    TI1 -->|STIX/TAXII| TI2
+    TI2 -->|Enrichment| TI3
+    TI3 -.->|Threat Context| F2
+    TI3 -.->|IoC Matching| F3
+
+    VPC_SC -.->|Enforces| G2
+    VPC_SC -.->|Enforces| G3
+    VPC_SC -.->|Enforces| G4
+    VPC_SC -.->|Enforces| G6
+    
+    WIF -.->|Authenticates| F1
+    WIF -.->|Authenticates| F2
+    WIF -.->|Authenticates| F3
+    WIF -.->|Authenticates| F4
+
+    classDef agent fill:#10b981,stroke:#047857,color:#fff,stroke-width:2px
+    classDef data fill:#3b82f6,stroke:#1e40af,color:#fff,stroke-width:2px
+    classDef security fill:#ef4444,stroke:#991b1b,color:#fff,stroke-width:2px
+    classDef output fill:#8b5cf6,stroke:#5b21b6,color:#fff,stroke-width:2px
+    classDef threat fill:#f59e0b,stroke:#d97706,color:#fff,stroke-width:2px
+    classDef pubsub fill:#4285f4,stroke:#1a73e8,color:#fff,stroke-width:2px
+    
+    class F1,F2,F3,F4 agent
+    class G2,G3,G4,G5,G6,G7 data
+    class VPC_SC,WIF,PSC security
+    class I1,I2,I3,I4 output
+    class TI1,TI2,TI3 threat
+    class D pubsub
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>Key Components</h3>
+            <ul>
+                <li><strong style="color:#10b981">Green (Agents):</strong> AI processing agents running on Cloud Run / Cloud Functions Gen2</li>
+                <li><strong style="color:#3b82f6">Blue (Data):</strong> BigQuery tables and Vertex AI endpoints for ML inference</li>
+                <li><strong style="color:#ef4444">Red (Security):</strong> VPC Service Controls and Workload Identity Federation</li>
+                <li><strong style="color:#8b5cf6">Purple (Output):</strong> Classification storage and alert routing destinations</li>
+                <li><strong style="color:#f59e0b">Orange (Threat Intel):</strong> External threat feeds and enrichment pipeline</li>
+            </ul>
+        </div>
+
+        <h2>1.1 Simplified Overview</h2>
+        <div class="description">
+            A cleaner view focusing on the core components and data flow, ideal for stakeholder presentations.
+            Shows the Jira change control enrichment integrated into the processing layer.
+        </div>
+        <div class="diagram-container">
+            <div class="mermaid">
+flowchart TD
+    subgraph "EXTERNAL"
+        A[Panther SIEM]
+        TI[TAXII2 Threat Feeds]
+        JIRA[Jira Cloud]
+    end
+
+    subgraph "GCP PROJECT: socalpha1"
+        subgraph "INGESTION LAYER"
+            D{{"Pub/Sub Topic<br/>panther-alerts-dev"}}
+        end
+
+        subgraph "PROCESSING LAYER - PRIVATE VPC"
+            subgraph "4 Parallel Agents"
+                F1["🔍 Goose Agent<br/>(Cloud Run)<br/>Rule Logic Analysis"]
+                F2["📚 RAG Agent<br/>(Cloud Function)<br/>Historical Context"]
+                F3["🔧 Config Agent<br/>(Cloud Function)<br/>Jira Change Correlation"]
+                F4["📊 Anomaly Agent<br/>(Cloud Function)<br/>Statistical Outliers"]
+            end
+
+            subgraph "ML/AI Services"
+                G1[DeepSeek LLM<br/>on Vertex AI]
+                G2[Vector Embeddings<br/>on Vertex AI]
+                G3[Anomaly Model<br/>on Vertex AI]
+            end
+
+            subgraph "Data Services"
+                DB1[(BigQuery<br/>Alert History<br/>+ Vectors)]
+                DB2[(Cloud Asset<br/>Inventory)]
+                DB3[(Jira Change<br/>Tickets)]
+            end
+        end
+
+        subgraph "ORCHESTRATION"
+            H{{"Cloud Workflows<br/>Decision Engine"}}
+        end
+
+        subgraph "OUTPUTS"
+            I1[(BigQuery<br/>Classifications)]
+            I2[Tines SOAR]
+            I3[Slack Alerts]
+        end
+    end
+
+    A ==>|Native Pub/Sub| D
+    D ==>|Fan-out| F1
+    D ==>|Fan-out| F2
+    D ==>|Fan-out| F3
+    D ==>|Fan-out| F4
+
+    F1 -.-> G1
+    F2 -.-> G1
+    F2 -.-> G2
+    F2 -.-> DB1
+    F3 -.-> DB2
+    F3 -.-> DB3
+    F4 -.-> G3
+    F4 -.-> DB1
+
+    TI -->|Dataflow| DB1
+    JIRA -->|Daily Sync| DB3
+
+    F1 --> H
+    F2 --> H
+    F3 --> H
+    F4 --> H
+
+    H --> I1
+    H -->|Med/High/Critical| I2
+    H -->|Critical| I3
+
+    style A fill:#ffe0b2
+    style D fill:#e3f2fd
+    style H fill:#f3e5f5
+    style JIRA fill:#0052CC,color:#fff
+    style DB3 fill:#0052CC,color:#fff
+    style F1 fill:#d4edda
+    style F2 fill:#d4edda
+    style F3 fill:#d4edda
+    style F4 fill:#d4edda
+            </div>
+        </div>
+
+        <h2>2. Change Control Integration Workflow</h2>
+        <div class="description">
+            Complete workflow from Jira change request through GitHub IaC pipeline to AWS deployment, CloudTrail logging, 
+            Panther detection, and SOC Alpha1 correlation. The Config Agent enriches CloudTrail-based alerts against the 
+            <code>jira_change_tickets</code> table — similar to how VirusTotal enriches DNS logs. 
+            <strong>Missing Jira correlation = Unauthorized Change = Critical Alert → Tines SOAR.</strong>
+        </div>
+        <div class="diagram-container">
+            <div class="mermaid">
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#1a365d', 'primaryTextColor':'#ffffff', 'primaryBorderColor':'#2b6cb0', 'lineColor':'#4a5568', 'secondaryColor':'#2d3748', 'tertiaryColor':'#e2e8f0', 'background':'#f7fafc'}}}%%
+
+flowchart TB
+    subgraph "CHANGE INITIATION"
+        direction TB
+        ENG[👤 Engineer<br/>Infrastructure Change Request]
+        
+        subgraph "JIRA WORKFLOW"
+            J1[📋 Create Change Request<br/>Type: CHG / RFC]
+            J2{CAB Review<br/>& Approval}
+            J3[✅ Status: APPROVED<br/>Change Window Assigned]
+            J4[❌ Status: REJECTED]
+        end
+        
+        ENG --> J1
+        J1 --> J2
+        J2 -->|Approved| J3
+        J2 -->|Rejected| J4
+    end
+
+    subgraph "GITHUB IaC REPOSITORY"
+        direction TB
+        subgraph "Feature Branch Workflow"
+            B1[🌿 Create Feature Branch<br/>CHG-XXXX-description]
+            B2[📝 Commit Terraform/CF Changes<br/>Conventional Commits]
+            B3[🔄 Open Pull Request<br/>Title: CHG-XXXX: Description]
+        end
+        
+        subgraph "Automated Validation Pipeline"
+            GHA1[🔍 GitHub Action:<br/>Extract Jira Key from PR]
+            GHA2[🔗 Validate Jira Ticket<br/>via Jira REST API]
+            GHA3[✅ Verify APPROVED Status<br/>Check Change Window]
+            GHA4[🔒 Terraform Plan<br/>+ Security Scan]
+        end
+        
+        subgraph "Merge Gate"
+            MG1{All Checks Pass?}
+            MG2[🔓 Enable Merge<br/>2 Reviewers Required]
+            MG3[⛔ Block Merge]
+        end
+        
+        J3 -.->|Reference Ticket| B1
+        B1 --> B2
+        B2 --> B3
+        B3 --> GHA1
+        GHA1 --> GHA2
+        GHA2 --> GHA3
+        GHA3 --> GHA4
+        GHA4 --> MG1
+        MG1 -->|Yes| MG2
+        MG1 -->|No| MG3
+    end
+
+    subgraph "AWS DEPLOYMENT"
+        direction TB
+        D1[🔀 Merge to Main]
+        D2[🚀 Terraform Apply<br/>via GitHub Actions]
+        D3[📦 AWS Resources<br/>Modified]
+        
+        subgraph "Metadata Injection"
+            META1[🏷️ Resource Tags:<br/>ChangeTicket=CHG-XXXX<br/>CommitSHA=abc123]
+        end
+        
+        MG2 --> D1
+        D1 --> D2
+        D2 --> D3
+        D2 --> META1
+    end
+
+    subgraph "AWS CLOUDTRAIL"
+        CT1[📜 CloudTrail Events<br/>All API Calls]
+        CT2[📤 S3 Bucket<br/>CloudTrail Logs]
+        
+        D3 --> CT1
+        CT1 --> CT2
+    end
+
+    subgraph "PANTHER SIEM"
+        P1[📥 S3 Log Ingestion]
+        P2[🎯 Detection Rules:<br/>AWS Config Changes<br/>IAM Modifications<br/>Security Group Updates]
+        P3[🚨 Alert Generated]
+        
+        CT2 --> P1
+        P1 --> P2
+        P2 --> P3
+    end
+
+    subgraph "SOC ALPHA1 - CONFIG AGENT"
+        SA1[📨 Pub/Sub Topic<br/>panther-alerts-dev]
+        CA1[🔧 Config Agent<br/>Cloud Function Gen2]
+        CA2[🔎 Entity Extraction<br/>resourceId, principal, action<br/>timestamp, region]
+        CA3[📊 BigQuery Enrichment Query<br/>jira_change_tickets]
+        CA4{Approved Ticket<br/>Correlates?}
+        
+        subgraph "Classification Output"
+            CO1[✅ AUTHORIZED<br/>Severity: Informational]
+            CO2[🚨 UNAUTHORIZED<br/>Severity: CRITICAL<br/>IOC: Missing Change Control]
+        end
+        
+        P3 ==>|Native Pub/Sub| SA1
+        SA1 --> CA1
+        CA1 --> CA2
+        CA2 --> CA3
+        CA3 --> CA4
+        CA4 -->|Yes - Ticket Found| CO1
+        CA4 -->|No - No Correlation| CO2
+    end
+
+    subgraph "OUTPUT ROUTING"
+        OUT1[📊 BigQuery<br/>classified_alerts]
+        OUT2[📈 Cloud Monitoring<br/>Metrics Dashboard]
+        OUT3[🎫 Tines SOAR<br/>Critical Incident]
+        OUT4[🔔 Slack<br/>#security-critical]
+        
+        CO1 --> OUT1
+        CO1 --> OUT2
+        CO2 --> OUT1
+        CO2 --> OUT3
+        CO2 --> OUT4
+    end
+
+    subgraph "JIRA DATA SYNC"
+        SYNC1[⏰ Scheduled Cloud Function<br/>Daily Sync]
+        SYNC2[📋 Jira Cloud API<br/>JQL: project=CHG]
+        SYNC3[📊 BigQuery Table<br/>jira_change_tickets]
+        
+        SYNC1 --> SYNC2
+        SYNC2 --> SYNC3
+        SYNC3 -.->|Enrichment Source| CA3
+    end
+
+    %% Styling
+    classDef jira fill:#0052CC,stroke:#003d99,color:#fff,stroke-width:2px
+    classDef github fill:#24292e,stroke:#1b1f23,color:#fff,stroke-width:2px
+    classDef aws fill:#FF9900,stroke:#cc7a00,color:#000,stroke-width:2px
+    classDef panther fill:#6366f1,stroke:#4f46e5,color:#fff,stroke-width:2px
+    classDef gcp fill:#4285F4,stroke:#2a65c9,color:#fff,stroke-width:2px
+    classDef authorized fill:#10B981,stroke:#059669,color:#fff,stroke-width:2px
+    classDef unauthorized fill:#EF4444,stroke:#DC2626,color:#fff,stroke-width:2px
+    classDef decision fill:#F59E0B,stroke:#D97706,color:#000,stroke-width:2px
+
+    class J1,J2,J3,J4 jira
+    class B1,B2,B3,GHA1,GHA2,GHA3,GHA4,MG1,MG2,MG3,D1,D2 github
+    class D3,CT1,CT2,META1 aws
+    class P1,P2,P3 panther
+    class SA1,CA1,CA2,CA3,CA4,SYNC1,SYNC2,SYNC3 gcp
+    class CO1,OUT1,OUT2 authorized
+    class CO2,OUT3,OUT4 unauthorized
+    class J2,MG1,CA4 decision
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>Change Control Enrichment Model</h3>
+            <ul>
+                <li><strong>Enrichment Source:</strong> <code>jira_change_tickets</code> table in BigQuery (synced daily from Jira Cloud)</li>
+                <li><strong>Correlation Keys:</strong> Resource ID, Principal, Timestamp Window, Change Ticket ID (if tagged)</li>
+                <li><strong>Authorized Change:</strong> CloudTrail event correlates to APPROVED Jira ticket within change window</li>
+                <li><strong>Unauthorized Change:</strong> CloudTrail event has NO correlated Jira ticket → <span style="color:#ef4444;font-weight:bold">CRITICAL</span> → Tines SOAR</li>
+            </ul>
+        </div>
+
+        <h2>3. Classification Decision Flow</h2>
+        <div class="description">
+            State machine logic showing how the system makes classification decisions based on agent outputs.
+            Two paths generate <strong>Critical</strong> alerts: (1) Unauthorized AWS changes lacking Jira correlation, 
+            (2) Novel anomalies with high statistical scores and no historical matches. All Medium, High, and Critical alerts route to Tines SOAR.
+        </div>
+        <div class="diagram-container">
+            <div class="mermaid">
+stateDiagram-v2
+    [*] --> ReceiveAlert
+    
+    ReceiveAlert --> ParallelProcessing
+    
+    state ParallelProcessing {
+        [*] --> GooseAgent
+        [*] --> RAGAgent
+        [*] --> ConfigAgent
+        [*] --> AnomalyAgent
+        
+        GooseAgent --> GooseResult
+        RAGAgent --> RAGResult
+        ConfigAgent --> ConfigResult
+        AnomalyAgent --> AnomalyResult
+        
+        GooseResult --> [*]
+        RAGResult --> [*]
+        ConfigResult --> [*]
+        AnomalyResult --> [*]
+    }
+    
+    ParallelProcessing --> DecisionEngine
+
+    state DecisionEngine {
+        [*] --> CheckUnauthorized
+        
+        CheckUnauthorized --> CRITICAL_Change: No Jira Ticket
+        CheckUnauthorized --> CheckAnomaly: Has Correlation
+        
+        CheckAnomaly --> CRITICAL_Novel: High Score + No History
+        CheckAnomaly --> CheckThreat: Normal Score
+        
+        CheckThreat --> HIGH_Recurring: Known Pattern
+        CheckThreat --> CheckMedium: Unknown
+        
+        CheckMedium --> MEDIUM_Alert: Elevated Risk
+        CheckMedium --> LOW_Info: Low Risk
+    }
+
+    CRITICAL_Change --> WriteResult
+    CRITICAL_Novel --> WriteResult
+    HIGH_Recurring --> WriteResult
+    MEDIUM_Alert --> WriteResult
+    LOW_Info --> WriteResult
+    
+    WriteResult --> RouteOutput
+
+    state RouteOutput {
+        [*] --> EvalSeverity
+        
+        EvalSeverity --> TinesSOAR: Med or High or Critical
+        EvalSeverity --> LogOnly: Low or Info
+        
+        TinesSOAR --> CheckCrit
+        CheckCrit --> SlackAlert: Critical
+        CheckCrit --> Done: Not Critical
+        
+        SlackAlert --> Done
+        LogOnly --> Done
+        Done --> [*]
+    }
+    
+    RouteOutput --> [*]
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>Severity Classification & Routing</h3>
+            <ul>
+                <li><strong style="color:#ef4444">CRITICAL:</strong> Unauthorized AWS changes (no Jira) OR Novel anomalies → Tines SOAR + Slack</li>
+                <li><strong style="color:#f59e0b">HIGH:</strong> Known threat patterns with historical correlation → Tines SOAR</li>
+                <li><strong style="color:#3b82f6">MEDIUM:</strong> Elevated risk requiring review → Tines SOAR</li>
+                <li><strong style="color:#6b7280">LOW/INFO:</strong> Authorized changes, expected behavior → BigQuery logging only</li>
+            </ul>
+        </div>
+
+        <h2>4. Data Transformation Pipeline</h2>
+        <div class="description">
+            Detailed view of data flow through each agent and the specific transformations applied. 
+            The Config Agent performs Jira enrichment correlation — CloudTrail-based alerts "rub against" the 
+            <code>jira_change_tickets</code> table to validate authorization status.
+        </div>
+        <div class="diagram-container">
+            <div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+
+flowchart LR
+    subgraph "DATA SOURCES"
+        P[Panther Alert<br/>JSON Payload]
+        H[Historical Alerts<br/>90 Days]
+        CAI[Cloud Asset<br/>Inventory]
+        AL[Audit Logs<br/>6 Hours]
+        JT[Jira Tickets<br/>BigQuery Sync]
+        TF[TAXII Feeds]
+    end
+
+    subgraph "NATIVE INGESTION"
+        P ==>|Direct Pub/Sub| PubSub{Pub/Sub<br/>panther-alerts-dev}
+    end
+
+    subgraph "AGENT 1: GOOSE - Rule Analysis"
+        PubSub --> G1[Extract rule_id<br/>from Alert]
+        G1 --> G2[Fetch Detection<br/>Python Code]
+        G2 --> G3[DeepSeek-R1<br/>Intent Analysis]
+        G3 --> G4[Rule Intent JSON<br/>threat_type, severity_rationale]
+    end
+
+    subgraph "AGENT 2: RAG - Historical Context"
+        PubSub --> R1[Generate Alert<br/>Embedding]
+        H --> R2[Vector Index<br/>BigQuery]
+        R1 --> R3[k-NN Similarity<br/>Search]
+        R2 --> R3
+        TF --> R2
+        R3 --> R4[Historical Context<br/>risk_score, similar_count]
+    end
+
+    subgraph "AGENT 3: CONFIG - Change Correlation"
+        PubSub --> C1[Extract Entities<br/>resourceId, principal<br/>action, timestamp]
+        CAI --> C2[Asset Change<br/>Window Query]
+        AL --> C3[Audit Event<br/>Correlation]
+        JT --> C4[Jira Enrichment<br/>CHG Ticket Lookup]
+        C1 --> C5{Correlation<br/>Engine}
+        C2 --> C5
+        C3 --> C5
+        C4 --> C5
+        C5 --> C6A[✅ AUTHORIZED<br/>ticket_id, approver]
+        C5 --> C6B[🚨 UNAUTHORIZED<br/>ioc_flag: missing_change_control]
+    end
+
+    subgraph "AGENT 4: ANOMALY - Statistical Detection"
+        PubSub --> A1[Feature Extraction<br/>numeric + categorical]
+        H --> A2[Isolation Forest<br/>Model Training]
+        A1 --> A3[Anomaly Scoring]
+        A2 --> A3
+        A3 --> A4[Anomaly Result<br/>score, is_novel]
+    end
+
+    subgraph "AGGREGATION"
+        G4 --> AGG{Cloud Workflows<br/>Decision Engine}
+        R4 --> AGG
+        C6A --> AGG
+        C6B --> AGG
+        A4 --> AGG
+        
+        AGG --> CLASS[Final Classification<br/>severity, category, evidence]
+    end
+
+    subgraph "OUTPUT DESTINATIONS"
+        CLASS --> BQ[(BigQuery<br/>classified_alerts)]
+        CLASS --> TINES[Tines SOAR<br/>Med/High/Critical]
+        CLASS --> SLACK[Slack<br/>Critical Only]
+        CLASS --> DASH[Cloud Monitoring<br/>Dashboards]
+    end
+
+    style P fill:#ffe0b2
+    style PubSub fill:#e3f2fd
+    style AGG fill:#f3e5f5
+    style CLASS fill:#ffebee
+    style C6A fill:#d4edda
+    style C6B fill:#f8d7da
+    style TINES fill:#e8daef
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>Agent Output Schemas</h3>
+            <ul>
+                <li><strong>Goose Agent:</strong> <code>{rule_id, threat_type, severity_rationale, recommended_action}</code></li>
+                <li><strong>RAG Agent:</strong> <code>{similar_alerts[], risk_score, historical_context, is_recurring}</code></li>
+                <li><strong>Config Agent:</strong> <code>{is_authorized, ticket_id?, approver?, ioc_flag?, correlation_evidence}</code></li>
+                <li><strong>Anomaly Agent:</strong> <code>{anomaly_score, is_novel, feature_contributions[], percentile}</code></li>
+            </ul>
+        </div>
+
+        <div class="summary-box">
+            <h3>Implementation Timeline</h3>
+            <p><strong>Week 1-2:</strong> Infrastructure setup, VPC configuration, Private Service Connect, Pub/Sub native integration<br>
+            <strong>Week 3-4:</strong> Deploy Vertex AI models, implement core agents, Jira BigQuery sync pipeline<br>
+            <strong>Week 5-6:</strong> Config Agent Jira correlation logic, integration testing, Cloud Workflows orchestration<br>
+            <strong>Week 7-8:</strong> End-to-end testing, Tines SOAR integration, performance tuning, production deployment</p>
+        </div>
+
+        <div class="positioning-box">
+            <h4>📋 BigQuery Table: jira_change_tickets</h4>
+            <p>Schema for the Jira enrichment source table:</p>
+            <pre style="background:#1f2937;color:#f3f4f6;padding:10px;border-radius:5px;overflow-x:auto;">
+ticket_id       STRING    -- CHG-1234
+status          STRING    -- APPROVED, REJECTED, PENDING
+approver        STRING    -- user@domain.com
+change_window   STRUCT    -- {start: TIMESTAMP, end: TIMESTAMP}
+affected_resources ARRAY&lt;STRING&gt;  -- [arn:aws:ec2:..., arn:aws:iam:...]
+commit_sha      STRING    -- abc123def456
+pr_url          STRING    -- github.com/org/repo/pull/123
+created_at      TIMESTAMP
+updated_at      TIMESTAMP
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            stateDiagram: {
+                useMaxWidth: true
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</body>
+</html>
