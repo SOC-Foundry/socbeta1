@@ -11,6 +11,7 @@ class DownloadItem {
   final String version;
   final String filename;
   final String description;
+  final String sha256;
   final bool isNew;
 
   const DownloadItem({
@@ -18,6 +19,7 @@ class DownloadItem {
     required this.version,
     required this.filename,
     required this.description,
+    required this.sha256,
     this.isNew = false,
   });
 }
@@ -31,12 +33,14 @@ class DownloadsPage extends ConsumerWidget {
       version: '7.32.0-18504',
       filename: 'falcon-sensor_7.32.0-18504_amd64.deb',
       description: 'Stable release for production environments.',
+      sha256: '0c3ac12e749647cd05a8e8bd6281541e5ba8496ca1ba042eda6637f547db5dc0',
     ),
     DownloadItem(
       name: 'Falcon Sensor (Beta)',
       version: '7.34.0-18708',
       filename: 'falcon-sensor_7.34.0-18708_amd64.deb',
       description: 'Latest beta release with new features.',
+      sha256: 'b5a99132dcbc6aac63e19ec9b45fadfe36ae962750baee808a38d23f1d98cacd',
       isNew: true,
     ),
   ];
@@ -170,6 +174,14 @@ class DownloadsPage extends ConsumerWidget {
                 Text(
                   item.description,
                   style: AppTheme.darkTheme.textTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+                SelectableText(
+                  'SHA256: ${item.sha256}',
+                  style: GoogleFonts.jetBrainsMono(
+                    fontSize: 10,
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                  ),
                 ),
               ],
             ),
