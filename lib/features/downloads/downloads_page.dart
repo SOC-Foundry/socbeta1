@@ -50,8 +50,9 @@ class DownloadsPage extends ConsumerWidget {
     final uri = Uri.base.resolve('/downloads/${item.filename}');
     
     try {
-      // platformDefault is usually the best for downloads
-      if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
+      // Use webOnlyWindowName: '_self' to force download in the same tab
+      // This bypasses popup blockers which often catch new-tab downloads
+      if (!await launchUrl(uri, webOnlyWindowName: '_self')) {
          debugPrint('Could not launch $uri');
       }
     } catch (e) {

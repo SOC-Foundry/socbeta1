@@ -13,6 +13,9 @@ This is a Flutter web application using Firebase Hosting and Firestore.
 - When creating UI, prioritize responsiveness for Web (Mobile, Tablet, Desktop layouts).
 - Return all simplified async logic as `Future<void>` or `Stream<T>`.
 
+# Operational Rules
+- **Git Operations:** Do NOT run `git` commands (add, commit, push) automatically. Always ask for user confirmation or let the user run them.
+
 ---
 
 ## Project Updates (December 3, 2025)
