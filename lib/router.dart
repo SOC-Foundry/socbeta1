@@ -14,7 +14,7 @@ final router = GoRouter(
       builder: (context, state) => const HomePage(),
     ),
     GoRoute(
-      path: '/downloads',
+      path: '/installers',
       builder: (context, state) => const DownloadsPage(),
     ),
   ],

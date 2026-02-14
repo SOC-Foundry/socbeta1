@@ -65,7 +65,7 @@ class DownloadsPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Downloads', style: AppTheme.darkTheme.textTheme.headlineSmall),
+        title: Text('Installers', style: AppTheme.darkTheme.textTheme.headlineSmall),
         backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: false,
