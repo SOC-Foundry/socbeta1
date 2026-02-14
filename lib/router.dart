@@ -4,7 +4,7 @@ import 'home_page.dart';
 import 'features/downloads/downloads_page.dart';
 
 final router = GoRouter(
-  initialLocation: '/',
+  // initialLocation: '/', // Let the platform decide (browser URL)
   observers: [
     FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
   ],
@@ -18,4 +18,12 @@ final router = GoRouter(
       builder: (context, state) => const DownloadsPage(),
     ),
   ],
+  redirect: (context, state) {
+    // Normalize path by removing trailing slash if present
+    final path = state.uri.path;
+    if (path != '/' && path.endsWith('/')) {
+      return path.substring(0, path.length - 1);
+    }
+    return null;
+  },
 );
