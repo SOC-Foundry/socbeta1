@@ -91,6 +91,15 @@ flutter analyze .
 
 ---
 
+## 📦 Recent Updates (Feb 2026)
+-   **Downloads Section**: Added a new page (`/downloads`) for downloading Falcon Sensor packages.
+    -   Lists available Stable and Beta versions.
+    -   Tracks downloads via Firebase Analytics.
+-   **Routing**: Updated `router.dart` to include the `/downloads` route.
+-   **Infrastructure**: Verified `PKGBUILD` compatibility with Firebase Hosting (static files served before app routing).
+
+---
+
 ## 🤝 Contribution Workflow
 
 1.  **Check the Board**: Pick a task.
