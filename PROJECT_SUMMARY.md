@@ -37,3 +37,17 @@ Transform a placeholder Flutter project (`socbeta1`) into **SOC Foundry**: a pro
 *   **GitHub Actions:**
     *   Updated workflows (`firebase-hosting-merge.yml`, `firebase-hosting-pull-request.yml`) to install Flutter and run `flutter build web` before deployment, replacing the legacy Node.js build steps.
     *   Synced repository secrets (`FIREBASE_SERVICE_ACCOUNT_WEBSITEALPHA`) with the new GitHub repository location.
+
+## 📥 February 2026: Distribution Module
+*   **Objective**: Enable distribution of Falcon Sensor `.deb` packages via the web portal while maintaining backward compatibility with existing `PKGBUILD` scripts.
+*   **Implementation**:
+    *   **Dual-Path Strategy**:
+        *   **Static**: `web/downloads/` directory serves files directly to `pacman`/`curl`.
+        *   **Dynamic**: `/installers` route renders a Flutter UI for human users.
+    *   **Routing Architecture**:
+        *   Resolved namespace collision between static folders and SPA routing by renaming the UI route.
+        *   Configured `firebase.json` headers to bypass forceful caching of `index.html`.
+    *   **UI Enhancements**:
+        *   Added SHA256 checksum display.
+        *   Implemented "New" badge logic for beta releases.
+        *   Fixed browser popup blocking by optimizing `launchUrl` vs Analytics execution order.

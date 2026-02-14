@@ -92,11 +92,18 @@ flutter analyze .
 ---
 
 ## 📦 Recent Updates (Feb 2026)
--   **Installers Section**: Added a new page (`/installers`) for downloading Falcon Sensor packages.
-    -   Lists available Stable and Beta versions.
-    -   Tracks downloads via Firebase Analytics.
--   **Routing**: Updated `router.dart` to include the `/installers` route.
--   **Infrastructure**: Verified `PKGBUILD` compatibility with Firebase Hosting (static files served before app routing).
+
+### Installers & Distribution
+-   **New "Installers" Page**: Created `/installers` to host Falcon Sensor packages.
+    -   *Note*: Renamed from `/downloads` to avoid namespace collision with the static `web/downloads/` directory used by `PKGBUILD`/`pacman`.
+-   **Features**:
+    -   **SHA256 Checksums**: Displayed for verification of download integrity.
+    -   **Analytics**: Tracks file downloads via Firebase `file_download` events.
+    -   **Direct Links**: Preserved direct file access (e.g., `domain.com/downloads/package.deb`) for automated tooling.
+-   **Technical Fixes**:
+    -   **PathUrlStrategy**: Enabled to remove hash (`#`) from URLs.
+    -   **Routing**: Implemented `<base href="/">` and server-side cache busting to ensure the SPA router handles non-static paths.
+    -   **User Gesture**: Optimized download button logic to trigger immediately, preventing browser popup blockers.
 
 ---
 

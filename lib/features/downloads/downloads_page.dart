@@ -46,21 +46,29 @@ class DownloadsPage extends ConsumerWidget {
   ];
 
   Future<void> _downloadFile(DownloadItem item) async {
-    // 1. Log Analytics Event
-    await FirebaseAnalytics.instance.logEvent(
-      name: 'file_download',
-      parameters: {
-        'file_name': item.filename,
-        'file_version': item.version,
-      },
-    );
+    // 1. Launch URL immediately to preserve user gesture (critical for Web)
+    final uri = Uri.base.resolve('/downloads/${item.filename}');
+    
+    try {
+      // platformDefault is usually the best for downloads
+      if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
+         debugPrint('Could not launch $uri');
+      }
+    } catch (e) {
+      debugPrint('Error launching $uri: $e');
+    }
 
-    // 2. Launch URL
-    final uri = Uri.parse('/downloads/${item.filename}');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      debugPrint('Could not launch $uri');
+    // 2. Log Analytics Event (Fire and forget, or await after launch)
+    try {
+      await FirebaseAnalytics.instance.logEvent(
+        name: 'file_download',
+        parameters: {
+          'file_name': item.filename,
+          'file_version': item.version,
+        },
+      );
+    } catch (e) {
+       debugPrint('Analytics error: $e');
     }
   }
 
